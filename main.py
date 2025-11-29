@@ -79,6 +79,7 @@ def checkIn(user, pwd):
             resp.encoding = resp.apparent_encoding
             if resp.ok:
                 if '失败' in resp.text:
+                    del accounts_list[user]
                     print("密码错误")
                     return
                 url = 'https://bbs.binmt.cc/k_misign-sign.html'
@@ -136,23 +137,21 @@ def start():
                 time.sleep(3)
         start()
 
-if 'mtluntan' in os.environ and 'ips' in os.environ:
-    mtluntan = os.environ.get("mtluntan", "")
-    ips = os.environ.get("ips", "")
-    if not ips:
-        print('github ips变量未设置')
-        exit(1)
-    if not mtluntan:
-        print('github mtluntan变量未设置')
-        exit(1)
-    for duo in mtluntan.split(","):
-        if ':' not in duo:
-            continue
-        username, password = duo.split(':', 1)
-        username = username.strip()
-        password = password.strip()
-        if username and password:
-            accounts_list[username] = password
-    # s.update(ips.split("\n"))
-    s.update([ip for ip in ips.split("\n") if ip.strip()])
-    start()
+mtluntan = os.environ.get("mtluntan", "")
+ips = os.environ.get("ips", "")
+if not ips:
+    print('github ips变量未设置')
+    exit(1)
+if not mtluntan:
+    print('github mtluntan变量未设置')
+    exit(1)
+for duo in mtluntan.split(","):
+    if ':' not in duo:
+        continue
+    username, password = duo.split(':', 1)
+    username = username.strip()
+    password = password.strip()
+    if username and password:
+        accounts_list[username] = password
+s.update([ip for ip in ips.split("\n") if ip.strip()])
+start()
