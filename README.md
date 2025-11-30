@@ -18,7 +18,7 @@
 例如:  
    >  127.0.0.1:80  
       127.0.0.1:81  
-     127.0.0.1:82  
+127.0.0.1:82  
 
 4. 在 GitHub 仓库的 Settings → Actions → General 设置 Workflow permissions > 选Read and write permissions和Allow GitHub Actions to create and approve pull requests
 
