@@ -88,13 +88,14 @@ class Preferences:
             except Exception as e:
                 print(f"Git操作失败: {e}")
 
+pathName = "prefs.sqlite"
 try:
-    prefs = Preferences("prefs.sqlite")
+    prefs = Preferences(pathName)
 except Exception as e:
-    if os.path.exists("prefs.sqlite"):
+    if os.path.exists(pathName):
         try:
-            os.remove("prefs.sqlite")
-            print(f"已删除损坏的数据库文件: {prefs._db_path}")
+            os.remove(pathName)
+            print(f"已删除损坏的数据库文件: {pathName}")
         except Exception as remove_error:
             print(f"删除损坏的数据库文件文件失败: {remove_error}")
     prefs = Preferences()
