@@ -83,11 +83,11 @@ class Preferences:
         db_path = self.get_db_path()
         if os.path.exists(db_path):
             try:
-                if os.system(f'git add "{db_path}"') == 0:
-                    os.system('git config --local user.name "github-actions[bot]"')
-                    os.system('git config --local user.email "github-actions[bot]@users.noreply.github.com"')
-                    os.system('git commit -m "更新数据库文件"')
-                    os.system('git push --quiet --force-with-lease')
+                if os.system(f'git add "{db_path}" >/dev/null 2>&1') == 0:
+                    os.system('git config --local user.name "github-actions[bot]" >/dev/null 2>&1')
+                    os.system('git config --local user.email "github-actions[bot]@users.noreply.github.com" >/dev/null 2>&1')
+                    os.system('git commit -m "更新数据库文件" >/dev/null 2>&1')
+                    os.system('git push --quiet --force-with-lease >/dev/null 2>&1')
             except Exception as e:
                 print(f"Git操作失败: {e}")
 
