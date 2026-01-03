@@ -57,7 +57,7 @@ def lo():
         futures = [executor.submit(verify, proxy) for proxy in IP_LIST]
         for future in as_completed(futures):
             proxy, is_valid, requestTime = future.result()
-            if is_valid:
+            if not is_valid:
                 successful_proxies.append((proxy, requestTime))
     successful_proxies.sort(key=lambda x: x[1])
     print("ip响应时间:")
