@@ -1,4 +1,32 @@
-import json, requests, re, os, time, random
+210.16.160.222:7890
+111.79.111.126:3128
+202.96.165.47:7890
+36.129.129.215:9000
+101.47.17.165:7890
+120.240.110.145:22222
+223.84.179.184:10017
+39.185.41.193:5911
+202.112.51.124:3128
+220.197.44.36:3128
+221.202.27.194:10809
+101.47.16.15:7890
+223.159.210.130:7890
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+import json, requests, re, os, time, random, ipaddress
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from preferences import prefs
 
@@ -12,6 +40,21 @@ headers = {
     'Accept-Language': 'zh-CN,zh;q=0.9,en;q=0.8',
     'Connection': 'keep-alive'
 }
+
+def validate_ip_port(ip, port):
+    try:
+        ip_obj = ipaddress.ip_address(ip)
+        if ip_obj.is_multicast or ip_obj.is_unspecified:
+            return False
+    except ValueError:
+        return False
+    ip_parts = ip.split('.')
+    for part in ip_parts:
+        if not 0 <= int(part) <= 255:
+            return False
+    if not 1 <= int(port) <= 65535:
+        return False
+    return True
 
 def verify(proxy):
     target_url = 'https://bbs.binmt.cc/forum.php?mod=guide&view=hot'
@@ -27,6 +70,16 @@ def verify(proxy):
         return proxy, False, -1
 
 def lo():
+    try:
+        with open("ips.txt", "r", encoding="utf-8") as f:
+            for line in f:
+                ip = line.strip()
+                if ":" not in ip or not ip: continue
+                newIp, newPort = ip.split(':', 1)
+                if not validate_ip_port(newIp, newPort): continue
+                IP_LIST.add(ip)
+    except Exception as e:
+        pass
     with ThreadPoolExecutor(max_workers=10) as executor:
         futures = [executor.submit(verify, proxy) for proxy in IP_LIST]
         for future in as_completed(futures):
@@ -117,8 +170,6 @@ def start():
             if checkIn(username, accounts_list[username], proxies): break
         if i < total - 1:
             time.sleep(3)
-def y(t, p):
-    print(f"{t} - {p}ms")
 
 ACCOUNTS = os.environ.get("ACCOUNTS", "")
 IPS = os.environ.get("IPS", "")
@@ -144,6 +195,6 @@ if accounts_list:
     lo()
     print("可用ip:")
     for proxy, req_time in successful_proxies:
-        y(proxy, req_time)
+        print(f"{proxy} - {req_time}ms")
 if successful_proxies:
     start()
