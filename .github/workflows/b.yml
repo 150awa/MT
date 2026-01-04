@@ -1,4 +1,4 @@
-name: B
+name: Verify
 
 on:
   schedule:
