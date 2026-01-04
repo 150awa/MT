@@ -1,4 +1,4 @@
-import requests, time, ipaddress
+import requests, time, ipaddress, os
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
 nVerify = set()
