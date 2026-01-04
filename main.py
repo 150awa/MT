@@ -5,7 +5,7 @@ from preferences import prefs
 key = f"{prefs.getTimes()}_{random.uniform(0, 100)}"
 print(key)
 prefs.put("cs", key)
-IP_LIST = set()
+IP_LIST = {}
 accounts_list = {}
 
 headers = {
@@ -66,7 +66,7 @@ def load():
     print("ip响应时间:")
     for index, (proxy, req_time) in enumerate(successful_proxies, 1):
         print(f"{index}: {proxy} - {req_time}ms")
-        IP_LIST.add(proxy)
+        IP_LIST[proxy] = True
 
 def checkIn(user, pwd, ip):
     req = requests.session()
@@ -119,8 +119,7 @@ def checkIn(user, pwd, ip):
                         return True
     except Exception as e:
         print(f"异常{str(e)}")
-        if ip in IP_LIST:
-            IP_LIST.remove(ip)
+        IP_LIST[ip] = False
     return False
 
 def loginhash(data):
@@ -166,7 +165,8 @@ def start():
         keys = list(accounts_list.keys())
         total = len(keys)
         for i, username in enumerate(keys):
-            for proxy in IP_LIST:
+            for proxy, sk in IP_LIST:
+                if not sk: continue
                 try:
                     if checkIn(username, accounts_list[username], proxy): break
                 except:
