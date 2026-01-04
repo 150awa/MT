@@ -6,8 +6,6 @@ from datetime import datetime
 import pytz
 import base64
 
-pathName = "prefs.sqlite"
-
 class Preferences:
     _instance = None
     _db_path = ""
@@ -24,9 +22,31 @@ class Preferences:
                     db_path = os.path.join(current_dir, db_path)
             os.makedirs(os.path.dirname(db_path), exist_ok=True)
             cls._instance._db_path = db_path
-            cls._instance.db = SqliteDict(db_path, autocommit=True)
+            cls._instance._init_or_recreate_db()
             atexit.register(cls._instance.close)
         return cls._instance
+
+    def _init_or_recreate_db(self):
+        db_path = self._db_path
+        try:
+            os.makedirs(os.path.dirname(db_path), exist_ok=True)
+            self.db = SqliteDict(db_path, autocommit=True)
+        except Exception as e:
+            try:
+                if hasattr(self, 'db'):
+                    self.db.close()
+            except:
+                pass
+            try:
+                if os.path.exists(db_path):
+                    os.remove(db_path)
+            except Exception as remove_error:
+                pass
+            try:
+                os.makedirs(os.path.dirname(db_path), exist_ok=True)
+                self.db = SqliteDict(db_path, autocommit=True)
+            except Exception as recreate_error:
+                raise
 
     def get(self, key, default=None):
         try:
@@ -81,27 +101,14 @@ class Preferences:
 
     def save(self):
         db_path = self.get_db_path()
-        if os.path.exists(db_path):
-            commit()
-
-def commit():
-    try:
-        os.system('git config --local user.name "github-actions[bot]" >/dev/null 2>&1')
-        os.system('git config --local user.email "github-actions[bot]@users.noreply.github.com" >/dev/null 2>&1')
-        if os.system(f'git add "{pathName}" >/dev/null 2>&1') == 0:
-            os.system('git commit -m "更新" >/dev/null 2>&1')
-            os.system('git pull --quiet --rebase')
-            os.system('git push --quiet --force-with-lease')
-    except Exception as e:
-        print(f"Git操作失败: {e}")
-
-try:
-    prefs = Preferences(pathName)
-except Exception as e:
-    if os.path.exists(pathName):
         try:
-            os.remove(pathName)
-            commit()
-        except Exception as remove_error:
-            print(f"删除损坏的数据库文件文件失败: {remove_error}")
-    prefs = Preferences()
+            os.system('git config --local user.name "github-actions[bot]" >/dev/null 2>&1')
+            os.system('git config --local user.email "github-actions[bot]@users.noreply.github.com" >/dev/null 2>&1')
+            if os.system(f'git add "{db_path}" >/dev/null 2>&1') == 0:
+                os.system('git commit -m "更新" >/dev/null 2>&1')
+                os.system('git pull --quiet --rebase')
+                os.system('git push --quiet --force-with-lease')
+        except Exception as e:
+            print(f"Git操作失败: {e}")
+
+prefs = Preferences()
