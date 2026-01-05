@@ -99,7 +99,7 @@ def checkIn(user, pwd, ip):
             if resp.ok:
                 if '失败' in resp.text:
                     del accounts_list[user]
-                    logger.critical("密码错误")
+                    logger.warning("密码错误")
                     return
                 url = 'https://bbs.binmt.cc/k_misign-sign.html'
                 resp = req.get(url, proxies=proxies, timeout=20)
@@ -145,7 +145,7 @@ def CDATA(data):
 def start():
     ACCOUNTS = os.environ.get("ACCOUNTS", "")
     if not ACCOUNTS:
-        logger.critical('github ACCOUNTS变量未设置')
+        logger.warning('github ACCOUNTS变量未设置')
         exit(1)
     for duo in ACCOUNTS.split(","):
         if ':' not in duo:
