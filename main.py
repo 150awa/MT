@@ -1,6 +1,7 @@
 import json, requests, re, os, time, random, ipaddress
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from preferences import prefs
+from logger import logger
 
 IP_LIST = {}
 accounts_list = {}
@@ -60,9 +61,9 @@ def load():
             if is_valid:
                 successful_proxies.append((proxy, requestTime))
     successful_proxies.sort(key=lambda x: x[1])
-    print("可用ip代理:")
+    logger.info("可用ip代理:")
     for index, (proxy, req_time) in enumerate(successful_proxies, 1):
-        print(f"{index}: {proxy} - {req_time}ms")
+        logger.info(f"{index}: {proxy} - {req_time}ms")
         IP_LIST[proxy] = True
 
 def checkIn(user, pwd, ip):
@@ -73,7 +74,7 @@ def checkIn(user, pwd, ip):
         'https': f'http://{ip}'
     }
     req.proxies = proxies
-    print(user, "开始签到")
+    logger.info(user, "开始签到")
     try:
         url = 'https://bbs.binmt.cc/member.php?mod=logging&action=login&infloat=yes&handlekey=login&inajax=1&ajaxtarget=fwin_content_login'
         resp = req.get(url, proxies=proxies, timeout=20)
@@ -98,7 +99,7 @@ def checkIn(user, pwd, ip):
             if resp.ok:
                 if '失败' in resp.text:
                     del accounts_list[user]
-                    print("密码错误")
+                    logger.critical("密码错误")
                     return
                 url = 'https://bbs.binmt.cc/k_misign-sign.html'
                 resp = req.get(url, proxies=proxies, timeout=20)
@@ -109,13 +110,14 @@ def checkIn(user, pwd, ip):
                     url = f'https://bbs.binmt.cc/plugin.php?id=k_misign:sign&operation=qiandao&format=text&formhash={_formhash}'
                     resp = req.get(url, proxies=proxies, timeout=20)
                     resp.encoding = resp.apparent_encoding
-                    print(CDATA(resp.text))
                     if '已签' in resp.text:
                         del accounts_list[user]
+                        logger.info(CDATA(resp.text))
                         prefs.put(user, prefs.getTime())
                         return True
+                    logger.warning(CDATA(resp.text))
     except Exception as e:
-        print(f"异常{str(e)}")
+        logger.warning(f"异常: {str(e)}")
         IP_LIST[ip] = False
     return False
 
@@ -143,7 +145,7 @@ def CDATA(data):
 def start():
     ACCOUNTS = os.environ.get("ACCOUNTS", "")
     if not ACCOUNTS:
-        print('github ACCOUNTS变量未设置')
+        logger.critical('github ACCOUNTS变量未设置')
         exit(1)
     for duo in ACCOUNTS.split(","):
         if ':' not in duo:
@@ -155,7 +157,7 @@ def start():
         if username and password and not YiQianDao:
             accounts_list[username] = password
         elif YiQianDao:
-            print(username, "今日已签, 跳过签到")
+            logger.info(username, "今日已签, 跳过签到")
     if accounts_list:
         load()
     if IP_LIST:
