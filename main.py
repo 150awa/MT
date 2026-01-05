@@ -74,7 +74,7 @@ def checkIn(user, pwd, ip):
         'https': f'http://{ip}'
     }
     req.proxies = proxies
-    logger.info(user, "开始签到")
+    logger.info(f"{user} 开始签到")
     try:
         url = 'https://bbs.binmt.cc/member.php?mod=logging&action=login&infloat=yes&handlekey=login&inajax=1&ajaxtarget=fwin_content_login'
         resp = req.get(url, proxies=proxies, timeout=20)
@@ -157,7 +157,7 @@ def start():
         if username and password and not YiQianDao:
             accounts_list[username] = password
         elif YiQianDao:
-            logger.info(username, "今日已签, 跳过签到")
+            logger.info(f"{username} 今日已签, 跳过签到")
     if accounts_list:
         load()
     if IP_LIST:
