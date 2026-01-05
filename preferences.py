@@ -60,7 +60,6 @@ class Preferences:
         try:
             self.db[self.e(key)] = self.e(value)
             self.db.commit()
-            self.save()
         except:
             pass
 
@@ -69,7 +68,6 @@ class Preferences:
             if self.e(key) in self.db:
                 del self.db[self.e(key)]
                 self.db.commit()
-                self.save()
         except:
             pass
 
@@ -77,7 +75,6 @@ class Preferences:
         try:
             self.db.clear()
             self.db.commit()
-            self.save()
         except:
             pass
 
