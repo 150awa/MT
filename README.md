@@ -23,7 +23,10 @@
 4. 在 GitHub 仓库的 Settings → Actions → General 设置允许推送权限
 5. GitHub Actions 初始手动执行检查是否有配置错误，脚本会自动每天执行,可手动执行
 
-   - **按照下面操作教程设置**
+<div align="center">
+  <sub>可以按照下面教程设置</sub>
+</div>
+
 
 ## 操作教程
 ### 设置变量
