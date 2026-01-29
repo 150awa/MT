@@ -161,7 +161,7 @@ def start():
     if not ACCOUNTS:
         logger.warning('github ACCOUNTS变量未设置')
         exit(1)
-    for duo in ACCOUNTS.split(","):
+    for duo in ACCOUNTS.split("\n"):
         if ':' not in duo:
             continue
         username, password = duo.split(':', 1)
